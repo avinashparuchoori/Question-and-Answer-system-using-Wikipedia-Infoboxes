@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 5//EN"
+"http://www.w3.org/TR/html5/html5.dtd">
+<html lang="en">
+<head>
+<style>
+.center
+{
+position:absolute;
+right:400px;
+left:400px;
+}
+</style>
+    <h1 style="text-align:center; color:blue; font-family:Times New Roman;
+font-size:100px;">Regex Search</h1>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"> </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+
+    <script>
+        
+$(document).ready(function(){
+    $("#btn1").click(function(){
+        
+     q=$("#text1").val();
+     if (!q) {
+        alert("Enter a query!!!");
+     }
+     else{
+
+
+ 
+ var url= "http://localhost:8983/solr/collection1/myquery?q="+q+"&wt=json&indent=true";
+  
+
+  
+
+        var callBack = function (data) {
+            
+
+var response = (JSON.parse(data))["final results"];
+var test=  (JSON.parse(data))["total relations retrieved"];
+var relations = (JSON.parse(data))["relations"];
+var field=  (JSON.parse(data))["desired relation"];
+var type = (JSON.parse(data))["type"];
+var message = (JSON.parse(data))["message"];
+
+
+
+if (response===undefined || response===null) {
+     document.getElementById('output').style.display = "none";
+      alert(message);
+     document.getElementById('text1').value = null;
+ 
+    
+}
+else if (type === "forward") 
+{
+    
+    
+ /* if(response===null)
+  {
+    document.getElementById('output').style.display = "none";
+    alert("Please rephrase the query and try !!! ");
+  }*/
+//  }
+
+var y = "";
+for (var j in relations ) {
+    //code
+    y += " "+ relations[j] + " <br /> ";
+}
+
+var x = "<p>";
+var i;
+var count = 0;
+var count2 = 0;
+var key = "";
+var field = "";
+for(i in response)
+{
+    var docs=response[i];
+    count++;
+    if (count%2 === 0) {
+    //code
+
+	for (var key in docs) {
+	    var reslt = docs[key];
+	    count2++;
+	    if (count2%2 === 0){
+		    //for (var key2 in reslt) {
+			x += " "+ reslt[field] + " <br /> ";
+		    //}
+	    }else{
+		//x += docs + " : ";
+	    }
+	}//code
+    }else{
+	 field = docs;
+	 x+= "<b>&nbsp;"+field+"&nbsp;</b>" + "&nbsp; : &nbsp;";
+    }
+}
+
+ x += "</p>";
+
+
+document.getElementById('output').style.display = "block";
+ document.getElementById('count').style.display = "block";
+  document.getElementById('output2').style.display = "block";
+    $("span.test").html(x);
+    $("span.test2").html(y);
+//$("p.count").html(test);
+}else {
+
+var y = "";
+for (var j in relations ) {
+    //code
+    y += " "+ relations[j] + " <br /> ";
+}
+
+var x = "<p>";
+var i;
+var count = 0;
+var count2 = 0;
+var key = "";
+var field = "";
+for(i in response)
+{
+    var docs=response[i];
+    count++;
+    if (count%2 === 0) {
+    //code
+
+	for (var key in docs) {
+	    var reslt = docs[key];
+	    if (reslt == "") {
+		//code
+	    }else{
+	    x+= "<b>"+key +"</b>" +"&nbsp; : &nbsp;"+reslt+"<br />";
+	    }
+	}//code
+    }else{
+	 field = docs;
+	 x+= "<h3>&nbsp;"+field+"&nbsp;</h3><br />" ;
+    }
+}
+
+ x += "</p>";
+
+
+document.getElementById('output').style.display = "block";
+ document.getElementById('count').style.display = "block";
+  document.getElementById('output2').style.display = "block";
+    $("span.test").html(x);
+    $("span.test2").html(y);
+}
+
+ }
+           var error = function (data) {
+	   var err = data.responseText;
+           alert(err);
+        }     
+         
+             $.ajax({
+                   
+                   beforeSend: function (request,response)
+            {
+                 request.setRequestHeader('Access-Control-Allow-Origin', '*');
+                 request.setRequestHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+                 request.setRequestHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+                 request.setRequestHeader('Access-Control-Allow-Credentials', true);
+             
+                
+            },
+            
+                    url: url,
+                   success: callBack,
+                   error:error
+                      
+             });
+     
+    }
+  });
+  });
+</script>
+    <script>
+	 function myFunction()
+	 {
+	    document.getElementById('output').value = null;
+	    document.getElementById('text1').value = null;
+	    document.getElementById('output').style.display = "none";
+	    document.getElementById('output2').style.display = "none";
+	    document.getElementById('count').style.display = "none";
+	 }
+    </script>
+</head>
+<body>
+<div class="center">
+<form method="get" action="http://www.google.com/search">
+<input type="text" value="" id="text1" size="40" style="width: 400px; height: 50px; font-size:14pt" placeholder="Either enter a query or ask" required=true x-webkit-speech>
+<button type="button" id="btn1" style="width: 100px; height:30px; font-size:14pt; color: green">Search</button>
+<button type="button" id="clear" style="width: 100px; height:30px; font-size:14pt; color: red;" onclick="myFunction();">Clear</button>
+</form>
+<br>
+    <div id="output" style="display:none;"><p><b>Top Results</b></p>
+    <span class="test"></span>
+  </div>
+     <div id="output2" style="display:none;"><p>Possible Relations:</p>
+    <span class="test2"></span>
+  </div>
+  
+  
+ 
+  <p id="count" class="count"></p>
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
